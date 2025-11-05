@@ -4,6 +4,9 @@ from time import sleep
 
 it=False
 direction=1
+#While it=False
+  #switch to it=true when trigger
+
 
 #while loop that says while the thing is running it=True
   #keep track of time
