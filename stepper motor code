@@ -1,0 +1,115 @@
+import numpy as np
+import RPi.GPIO as GPIO
+from time import sleep
+import time
+
+GPIO.setmode(GPIO.BCM)
+GPIO.setup(17, GPIO.OUT)
+GPIO.setup(27, GPIO.OUT)
+GPIO.setup(23, GPIO.OUT)
+GPIO.setup(24, GPIO.OUT)
+
+start = time.time()
+
+#counter-clockwise full step size
+for i in range(100):
+    GPIO.output(17, GPIO.HIGH)
+    GPIO.output(24, GPIO.HIGH)
+    sleep(0.01)
+    GPIO.output(23, GPIO.HIGH)
+    GPIO.output(24, GPIO.LOW)
+    sleep(0.01)
+    GPIO.output(27, GPIO.HIGH)
+    GPIO.output(17, GPIO.LOW)
+    sleep(0.01)
+    GPIO.output(24, GPIO.HIGH)
+    GPIO.output(23, GPIO.LOW)
+    sleep(0.01)
+    GPIO.output(27, GPIO.LOW)
+
+counterfull = time.time()
+
+#counter-clockwise half step size
+for i in range(100):
+    GPIO.output(17, GPIO.HIGH)
+    GPIO.output(24, GPIO.HIGH)
+    sleep(0.01)
+    GPIO.output(24, GPIO.LOW)
+    sleep(0.01)
+    GPIO.output(23, GPIO.HIGH)
+    sleep(0.01)
+    GPIO.output(17, GPIO.LOW)
+    sleep(0.01)
+    GPIO.output(27, GPIO.HIGH)
+    sleep(0.01)
+    GPIO.output(23, GPIO.LOW)
+    sleep(0.01)
+    GPIO.output(24, GPIO.HIGH)
+    sleep(0.01)
+    GPIO.output(27, GPIO.LOW)
+    sleep(0.01)
+
+counterhalf = time.time()
+
+#clockwise full step
+for i in range(100):
+    #four
+    GPIO.output(27, GPIO.HIGH)
+    GPIO.output(24, GPIO.HIGH)
+    GPIO.output(17, GPIO.LOW)                                    
+    GPIO.output(23, GPIO.LOW)
+    sleep(0.01)
+    #three
+    GPIO.output(23, GPIO.HIGH)
+    GPIO.output(24, GPIO.LOW)
+    sleep(0.01)
+    #two
+    GPIO.output(17, GPIO.HIGH)
+    GPIO.output(27, GPIO.LOW)
+    sleep(0.01)
+    #one
+    GPIO.output(24, GPIO.HIGH)
+    GPIO.output(23, GPIO.LOW)
+    sleep(0.01)
+    GPIO.output(17, GPIO.LOW)
+
+clockfull = time.time()
+
+#clockwise half step
+for i in range(100):
+    GPIO.output(24, GPIO.HIGH)
+    sleep(0.01)
+    GPIO.output(27, GPIO.HIGH)
+    sleep(0.01)
+    GPIO.output(24, GPIO.LOW)
+    sleep(0.01)
+    GPIO.output(23, GPIO.HIGH)
+    sleep(0.01)
+    GPIO.output(27, GPIO.LOW)
+    sleep(0.01)
+    GPIO.output(17, GPIO.HIGH)
+    sleep(0.01)
+    GPIO.output(23, GPIO.LOW)
+    sleep(0.01)
+    GPIO.output(24, GPIO.HIGH)
+    sleep(0.01)
+    GPIO.output(17, GPIO.LOW)
+    
+  
+GPIO.cleanup()
+
+end = time.time()
+totalrun = end - start
+backfull = counterfull - start
+backhalf = counterhalf - backfull - start
+forwardfull = clockfull - backhalf - backfull - start
+forwardhalf = end - forwardfull - backhalf - backfull - start
+print('Total runtime is', totalrun)
+print('Counterclockwise full steps time is', backfull)
+print('Counterclockwise half steps time is', backhalf)
+print('Clockwise full steps time is', forwardfull)
+print('Clockwise half steps time is', forwardhalf)
+
+
+
+
