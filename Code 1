@@ -1,2 +1,24 @@
 import numpy as np
 from time import sleep
+#import modules and libraries
+
+it=False
+direction=1
+
+#while loop that says while the thing is running it=True
+  #keep track of time
+  #while loop that says while direction=1 
+    #monitor the temperature sensor for speed 
+    #spin the motor
+    #function for switching between speeds based on temperature sensor
+    #monitor distance sensor to switch to direction=-1 if triggered
+
+  #while loop that says while direction=-1
+    #monitor the temperature sensor for speed
+    #spin the motor in the OTHER DIRECTION
+    #function for switching between speeds
+    #monitor distance sensor to switch to direction=1
+
+  #if distance sensor is triggered it=False
+  
+    
