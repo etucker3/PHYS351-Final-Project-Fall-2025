@@ -1,0 +1,30 @@
+import RPi.GPIO as GPIO
+from time import sleep
+import time 
+
+trig = 17
+echo = 22
+start = time.time()
+end = time.time()
+v = 343
+
+GPIO.setmode(GPIO.BCM)
+GPIO.setup(trig, GPIO.OUT)
+GPIO.setup(echo, GPIO.IN)
+GPIO.output(trig, False)
+sleep(1)
+while True:
+  GPIO.output(trig, True)
+  for i in range(0,8):
+    pass
+  GPIO.output(trig, False)
+  while GPIO.input(echo) == 0:
+    start = time.time()
+  while GPIO.input(echo) == 1:
+    end = time.time()
+
+    t = end-start
+  d = v*(t/2)
+
+  print (d*100, "m")
+GPIO.cleanup()
