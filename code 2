@@ -6,13 +6,13 @@ from time import time, sleep
 GPIO.setmode(GPIO.BCM)
 GPIO.setwarnings(False)
 
-trig_a = 17 #need to filll in cuz i forgot
+trig_a = 17 #need to fill in cuz i forgot
 echo_a = 22   
 trig_b = 17  
 echo_b = 27 
 
 
-motor_pins = [2, 3, 11, 17]
+MOTOR_PINS = [2, 3, 11, 17]
 
 
 SEQ = [(1,0,0,1),
@@ -21,7 +21,7 @@ SEQ = [(1,0,0,1),
        (0,0,1,1)]
 
 
-for p in motor_pins:
+for p in MOTOR_PINS:
     GPIO.setup(p, GPIO.OUT)
     GPIO.output(p, 0)
 
@@ -76,11 +76,11 @@ last_b = 0.0
 print("Wave Sensor B to toggle on/off. Wave Sensor A to change direction.")
 
 while True:
-    dB = distance_cm(TRIG_B, ECHO_B)
-    if dB < THRESH_CM and (time() - last_b) > DEBOUNCE_S:
+    dB = distance_cm(trig_b, echo_b)
+    if dB < thresh_cm and (time() - last_b) > debounce_s:
         system_on = not system_on
         last_b = time()
-        print("System ON" if system_on else "System OFF")
+        print("System on" if system_on else "System off")
 
     if not system_on:
         motor_off()
@@ -88,8 +88,8 @@ while True:
         continue
 
       
-    dA = distance_cm(TRIG_A, ECHO_A)
-    if dA < THRESH_CM and (time() - last_a) > DEBOUNCE_S:
+    dA = distance_cm(trig_a, echo_a)
+    if dA < THRESH_CM and (time() - last_a) > debounce_s:
         cw = not cw
         last_a = time()
         print("Direction:", "CW" if cw else "CCW")
