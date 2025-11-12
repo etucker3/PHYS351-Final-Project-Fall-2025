@@ -1,100 +1,82 @@
-
-
 import RPi.GPIO as GPIO
-from time import time, sleep
+import time
 
 GPIO.setmode(GPIO.BCM)
 GPIO.setwarnings(False)
 
-trig_a = 17 #need to fill in cuz i forgot
-echo_a = 22   
-trig_b = 17  
-echo_b = 27 
+v = 343
 
 
-MOTOR_PINS = [2, 3, 11, 17]
+trig_a = 23
+echo_a = 24
+trig_b = 27
+echo_b = 22
+motor_pins = [17,18,27,4]     
 
 
-SEQ = [(1,0,0,1),
-       (1,1,0,0),
-       (0,1,1,0),
-       (0,0,1,1)]
+SEQ = [
+    [1,0,0,1],
+    [1,1,0,0],
+    [0,1,1,0],
+    [0,0,1,1]
+]
 
 
-for p in MOTOR_PINS:
+for p in motor_pins:
     GPIO.setup(p, GPIO.OUT)
     GPIO.output(p, 0)
 
-for t, e in [(trig_a, echo_a), (trig_b, echo_b)]:
-    GPIO.setup(t, GPIO.OUT)
-    GPIO.setup(e, GPIO.IN)
-    GPIO.output(t, 0)
+for trig, echo in [(trig_a,echo_a),(trig_b,echo_b)]:
+    GPIO.setup(trig, GPIO.OUT)
+    GPIO.setup(echo, GPIO.IN)
 
+def distance(trig, echo):
+    GPIO.output(trig, True)
+    time.sleep(0.00001)
+    GPIO.output(trig, False)
 
-thresh_cm   = 15.0     #hand detect distance
-step_delay  = 0.002    #motor speed (bigger = slower)
-debounce_s  = 0.35     #one wave = one toggle
-sound_cm_s  = 34300.0  #speed of sound (cm/s)
-
-def distance_cm(trig, echo, timeout=0.03):
-    GPIO.output(trig, 1); sleep(0.0001); GPIO.output(trig, 0)
-
-    t = time()
+    start = time.time()
     while GPIO.input(echo) == 0:
-        if time() - t > timeout:
-            return 0.0001
-    start = time()
-
+        start = time.time()
     while GPIO.input(echo) == 1:
-        if time() - start > timeout:
-            return 0.0001
-    end = time()
+        stop = time.time()
 
-    dur = end - start
-    return (dur * sound_cm_s) / 2.0
+   
+    t = stop - start
+    distance = v*(t/2)
+    print(distance*100)
 
-def step_once(cw=True):
-    rng = range(4) if cw else range(3, -1, -1)
-    for i in rng:
-        a,b,c,d = SEQ[i]
-        GPIO.output(MOTOR_PINS[0], a)
-        GPIO.output(MOTOR_PINS[1], b)
-        GPIO.output(MOTOR_PINS[2], c)
-        GPIO.output(MOTOR_PINS[3], d)
-        sleep(step_delay)
-
-def motor_off():
-    for p in MOTOR_PINS:
-        GPIO.output(p, 0)
-
+def step(direction):
+    seq = SEQ if direction == 1 else list(reversed(SEQ))
+    for s in seq:
+        for pin, val in zip(motor_pins, s):
+            GPIO.output(pin, val)
+        time.sleep(0.002)
 
 system_on = False
-cw = True
-last_a = 0.0
-last_b = 0.0
+direction = 1
 
-print("Wave Sensor B to toggle on/off. Wave Sensor A to change direction.")
+print("Wave Sensor B to toggle on/off, wave Sensor A to change direction.")
 
-while True:
-    dB = distance_cm(trig_b, echo_b)
-    if dB < thresh_cm and (time() - last_b) > debounce_s:
-        system_on = not system_on
-        last_b = time()
-        print("System on" if system_on else "System off")
+try:
+    while True:
+        dB = distance(trig_b, echo_b)
+        if dB < 15:                     
+            system_on = not system_on
+            print("System on" if system_on else "System off")
+            time.sleep(1)               
 
-    if not system_on:
-        motor_off()
-        sleep(0.01)
-        continue
+        if system_on:
+            dA = distance(trig_a, echo_a)
+            if dA < 15:
+                direction *= -1
+                print("Direction:", "CW" if direction==1 else "CCW")
+                time.sleep(1)
+            step(direction)
+        else:
+            for p in motor_pins:
+                GPIO.output(p, 0)
+            time.sleep(0.1)
 
-      
-    dA = distance_cm(trig_a, echo_a)
-    if dA < THRESH_CM and (time() - last_a) > debounce_s:
-        cw = not cw
-        last_a = time()
-        print("Direction:", "CW" if cw else "CCW")
-
-     
-    step_once(cw)
-
-GPIO.cleanup()
+except KeyboardInterrupt:
+    GPIO.cleanup()
