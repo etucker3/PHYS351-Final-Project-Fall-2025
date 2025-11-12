@@ -1,0 +1,100 @@
+
+
+#import RPi.GPIO as GPIO
+#from time import time, sleep
+
+GPIO.setmode(GPIO.BCM)
+GPIO.setwarnings(False)
+
+trig_a = 17 #need to full in in case stuff changed   
+echo_a = 22   
+trig_b = 17  
+echo_b = 27 
+
+
+motor_pins = [2, 3, 11, 17]
+
+
+SEQ = [(1,0,0,1),
+       (1,1,0,0),
+       (0,1,1,0),
+       (0,0,1,1)]
+
+
+for p in motor_pins:
+    GPIO.setup(p, GPIO.OUT)
+    GPIO.output(p, 0)
+
+for t, e in [(trig_a, echo_a), (trig_b, echo_b)]:
+    GPIO.setup(t, GPIO.OUT)
+    GPIO.setup(e, GPIO.IN)
+    GPIO.output(t, 0)
+
+
+thresh_cm   = 15.0     #hand detect distance
+step_delay  = 0.002    #motor speed (bigger = slower)
+debounce_s  = 0.35     #one wave = one toggle
+sound_cm_s  = 34300.0  #speed of sound (cm/s)
+
+def distance_cm(trig, echo, timeout=0.03):
+    GPIO.output(trig, 1); sleep(0.0001); GPIO.output(trig, 0)
+
+    t = time()
+    while GPIO.input(echo) == 0:
+        if time() - t > timeout:
+            return 0.0001
+    start = time()
+
+    while GPIO.input(echo) == 1:
+        if time() - start > timeout:
+            return 0.0001
+    end = time()
+
+    dur = end - start
+    return (dur * sound_cm_s) / 2.0
+
+def step_once(cw=True):
+    rng = range(4) if cw else range(3, -1, -1)
+    for i in rng:
+        a,b,c,d = SEQ[i]
+        GPIO.output(MOTOR_PINS[0], a)
+        GPIO.output(MOTOR_PINS[1], b)
+        GPIO.output(MOTOR_PINS[2], c)
+        GPIO.output(MOTOR_PINS[3], d)
+        sleep(step_delay)
+
+def motor_off():
+    for p in MOTOR_PINS:
+        GPIO.output(p, 0)
+
+
+system_on = False
+cw = True
+last_a = 0.0
+last_b = 0.0
+
+print("Wave Sensor B to toggle on/off. Wave Sensor A to change direction.")
+
+while True:
+    dB = distance_cm(TRIG_B, ECHO_B)
+    if dB < THRESH_CM and (time() - last_b) > DEBOUNCE_S:
+        system_on = not system_on
+        last_b = time()
+        print("System ON" if system_on else "System OFF")
+
+    if not system_on:
+        motor_off()
+        sleep(0.01)
+        continue
+
+      
+    dA = distance_cm(TRIG_A, ECHO_A)
+    if dA < THRESH_CM and (time() - last_a) > DEBOUNCE_S:
+        cw = not cw
+        last_a = time()
+        print("Direction:", "CW" if cw else "CCW")
+
+     
+    step_once(cw)
+
+GPIO.cleanup()
