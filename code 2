@@ -6,7 +6,7 @@ from time import time, sleep
 GPIO.setmode(GPIO.BCM)
 GPIO.setwarnings(False)
 
-trig_a = 17 #need to full in in case stuff changed   
+trig_a = 17 #need to filll in cuz i forgot
 echo_a = 22   
 trig_b = 17  
 echo_b = 27 
