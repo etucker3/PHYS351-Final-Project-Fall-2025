@@ -1,0 +1,76 @@
+import RPi.GPIO as GPIO
+import time
+from time import sleep
+
+GPIO.setmode(GPIO.BCM)
+GPIO.setwarnings(False)
+
+pins = [2, 3, 17, 22]
+
+for p in pins:
+    GPIO.setup(p, GPIO.OUT)
+    GPIO.output(p, 0)
+
+full_step = [
+    [1,0,0,1],
+    [0,1,0,1],
+    [0,1,1,0],
+    [1,0,1,0]
+]
+
+half_step = [
+    [1,0,0,1],
+    [0,0,1,0],
+    [0,1,1,0],
+    [0,1,0,0],
+    [0,1,0,1],
+    [0,0,0,1],
+    [1,0,0,1],
+    [1,0,0,0]
+]
+
+start = time.time()
+for i in range(100):
+    for i in range(0,4):
+        GPIO.output(pins, full_step[i])
+        sleep(0.01)
+print("1st loop, CW")
+
+for i in range(100):
+    for i in range(3,0,-1):
+        GPIO.output(pins, full_step[i])
+        sleep(0.01)
+print("2nd loop, CCW")
+
+for i in range(100):
+    for i in range(0,8):
+        GPIO.output(pins, half_step[i])
+        sleep(0.01)
+print("3rd loop, CCW")
+
+for i in range(100):
+    for i in range(7,0,-1):
+        GPIO.output(pins, half_step[i])
+        sleep(0.01)
+print("4th loop, CW")
+
+end = time.time()
+run_time = end - start
+full_steps_rev = 200
+half_steps_rev = 400
+total_steps = (4*2*100) + (8*2*100)
+revolutions = total_steps/full_steps_rev
+period = run_time/total_steps
+frequency = 1/period
+turning_degrees = 360/full_steps_rev
+
+print("runtime", run_time)
+print("FSR", full_steps_rev)
+print("HSR", half_steps_rev)
+print("total steps", total_steps)
+print("revolutions", revolutions)
+print("period", period)
+print("frequency", frequency)
+print("turning degrees", turning_degrees)
+
+GPIO.cleanup()
