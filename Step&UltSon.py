@@ -1,4 +1,4 @@
-
+##Updated on and working as of November 14th
 
 import RPi.GPIO as GPIO
 from time import sleep
