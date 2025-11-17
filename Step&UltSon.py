@@ -18,6 +18,25 @@ trig_b = 17      #ultrasonic B trigger pin
 echo_b = 6     #ultrasonic B echo pin
 
 pin_a = [23, 24, 25, 5]   #stepper motor pins 
+led_pins = [x,x,x,x]
+
+for pin in led_pins:
+    GPIO.setup(pin,GPIO.OUT)
+
+pwms = [GPIO.PWM(pin,100) for pin in led_pins]
+
+for pwm in pwms:
+    pwm.start(0)
+for pwm in pwms:
+    for dc in range (0,100,6):
+        pwm.ChangeDutyCycle(100 -dc)
+        sleep(0.05)
+    for dc in range (100, -1, 5):
+        pwm.ChangeDutyCycle(100 -dc)
+        sleep(0.05)
+pwm.stop()
+     
+
 
 
 for p in pin_a:
@@ -120,7 +139,7 @@ try:
             print(f"Set counter on/off is {set_counter_b}")
             #sleep(x)
             system_off ^= 1
-            print("system on" if system_off else "system off")
+            print("system off" if system_off else "system on")
 
         dist_a = read_distance(trig_a, echo_a)
         print(f"Distance a is {dist_a}")
@@ -139,6 +158,25 @@ try:
             for p in pin_a:
                 GPIO.output(p,0)
                 sleep(0.01)
+            
+            for pin in led_pins:
+                GPIO.setup(pin,GPIO.OUT)
+
+            pwms = [GPIO.PWM(pin,100) for pin in led_pins]
+
+            for pwm in pwms:
+                pwm.start(0)
+            for pwm in pwms:
+                for dc in range (0,100,6):
+                    pwm.ChangeDutyCycle(100 -dc)
+                    sleep(0.05)
+                for dc in range (100, -1, 5):
+                    pwm.ChangeDutyCycle(100 -dc)
+                    sleep(0.05)
+
+     
+            
+            
             continue
 
 
@@ -150,6 +188,11 @@ try:
             for i in range(3, -1, -1):
                 GPIO.output(pin_a, full_step[i])
                 sleep(0.01)
+
+            
+
+
+
 except KeyboardInterrupt:
     pass
 finally:
