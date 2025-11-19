@@ -18,7 +18,7 @@ trig_b = 17      #ultrasonic B trigger pin
 echo_b = 6     #ultrasonic B echo pin
 
 pin_a = [23, 24, 25, 5]   #stepper motor pins 
-led_pins = [x,x,x,x]
+led_pins = [27, 16, 26]
 
 for pin in led_pins:
     GPIO.setup(pin,GPIO.OUT)
