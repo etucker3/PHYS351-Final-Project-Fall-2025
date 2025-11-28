@@ -149,7 +149,7 @@ try:
             dist_history_a.pop(0)
         if len(dist_history_a) == hyst and all(d<distance_trigger for d in dist_history_a):
             dist_history_a = [] # reset the list
-            print(f"Set counter direction cange is {set_counter_b}")
+            print(f"Set counter direction change is {set_counter_b}")
             set_counter_a +=1
             #sleep(x)
             print("direction change")
