@@ -2,6 +2,7 @@
 
 import RPi.GPIO as GPIO
 from time import sleep
+import pygame
 import time
 
 
@@ -189,6 +190,58 @@ try:
                 GPIO.output(pin_a, full_step[i])
                 sleep(0.01)
 
+
+        pygame.mixer.init()
+
+        Aff1 = pygame.mixer.Sound('/home/pi/Documents/Final/Aff1.wav')
+        Aff2 = pygame.mixer.Sound('/home/pi/Documents/Final/Aff2.wav')
+        Aff3 = pygame.mixer.Sound('/home/pi/Documents/Final/Aff3.wav')
+        Aff4 = pygame.mixer.Sound('/home/pi/Documents/Final/Aff4.wav')        
+        Aff5 = pygame.mixer.Sound('/home/pi/Documents/Final/Aff5.wav')
+        Aff6 = pygame.mixer.Sound('/home/pi/Documents/Final/Aff6.wav')
+
+
+        remainder = set_counter_a % 6
+
+        if remainder == 0:
+            Aff1.play()
+        elif remainder == 1:
+            Aff2.play()
+        elif remainder == 2:
+            Aff3.play()
+        elif remainder == 3:
+            Aff4.play()
+        elif remainder == 4:
+            Aff5.play()
+        elif remainder == 5:
+            Aff6.play()
+
+        while pygame.mixer.get_busy():
+            pygame.time.delay(100)
+
+    
+            
+
+'''
+
+
+sounds = [
+    pygame.mixer.Sound('/home/pi/Documents/Final/Aff1.wav'),
+    pygame.mixer.Sound('/home/pi/Documents/Final/Aff2.wav'),
+    pygame.mixer.Sound('/home/pi/Documents/Final/Aff3.wav'),
+    pygame.mixer.Sound('/home/pi/Documents/Final/Aff4.wav'),
+    pygame.mixer.Sound('/home/pi/Documents/Final/Aff5.wav'),
+    pygame.mixer.Sound('/home/pi/Documents/Final/Aff6.wav')
+]
+
+
+index = set_counter_a % 6     
+sound = sounds[index]         
+
+playing = sound.play()
+while playing.get_busy():
+    pygame.time.delay(100)
+'''
             
 
 
