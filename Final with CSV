@@ -114,6 +114,11 @@ Aff4 = pygame.mixer.Sound('/home/pi/Documents/Final/Aff4.wav')
 Aff5 = pygame.mixer.Sound('/home/pi/Documents/Final/Aff5.wav')
 Aff6 = pygame.mixer.Sound('/home/pi/Documents/Final/Aff6.wav')
 
+ONOFF=['# of on/off triggers']
+DIREC=['# of direction changes']
+rots=['# of rotations in either direction']
+seed=['Seed']
+AFF=['Affirmation']
 start2=[]
 
 try:
@@ -181,24 +186,33 @@ finally:
 
 
 remainder = set_counter_a % 6
+DIREC.append(set_counter_a)
+seed.append(remainder)
+ONOFF.append(set_counter_b)
 
 if remainder == 0:
+    AFF.append('Breathe in, breathe out')
     Aff1.play()
 elif remainder == 1:
+    AFF.append('Live in the moment')
     Aff2.play()
 elif remainder == 2:
+    AFF.append('Release all stress')
     Aff3.play()
 elif remainder == 3:
+    AFF.append('Focus on the good energy')
     Aff4.play()
 elif remainder == 4:
+    AFF.append('Be thankful')
     Aff5.play()
 elif remainder == 5:
+    AFF.append('Quiet moments build clear thoughts')
     Aff6.play()
 
 while pygame.mixer.get_busy():
     pygame.time.delay(100)
 
 
-combined_array = np.column_stack((ARRAY1, ARRAY2))
+combined_array = np.column_stack((np.array(ONOFF), np.array(DIREC),np.array(seed),np.array(AFF)))
 
-np.savetxt('CHANGE.csv', combined_array, delimiter = ',', header = 'CHANGE, CHANGE', fmt = '%.3f')
+np.savetxt('Harmony.csv', combined_array, delimiter = ',', fmt = '%.3f')
