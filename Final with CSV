@@ -197,3 +197,8 @@ elif remainder == 5:
 
 while pygame.mixer.get_busy():
     pygame.time.delay(100)
+
+
+combined_array = np.column_stack((ARRAY1, ARRAY2))
+
+np.savetxt('CHANGE.csv', combined_array, delimiter = ',', header = 'CHANGE, CHANGE', fmt = '%.3f')
