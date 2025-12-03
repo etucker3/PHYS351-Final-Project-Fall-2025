@@ -1,8 +1,8 @@
-
 import RPi.GPIO as GPIO
 from time import sleep
 import pygame
 import time
+import numpy as np
 
 
 
@@ -107,6 +107,7 @@ distance_trigger = 8
 
 pygame.mixer.init()
 
+Music = pygame.mixer.Sound('/home/pi/Documents/Final/Music.wav')
 Aff1 = pygame.mixer.Sound('/home/pi/Documents/Final/Aff1.wav')
 Aff2 = pygame.mixer.Sound('/home/pi/Documents/Final/Aff2.wav')
 Aff3 = pygame.mixer.Sound('/home/pi/Documents/Final/Aff3.wav')
@@ -114,11 +115,13 @@ Aff4 = pygame.mixer.Sound('/home/pi/Documents/Final/Aff4.wav')
 Aff5 = pygame.mixer.Sound('/home/pi/Documents/Final/Aff5.wav')
 Aff6 = pygame.mixer.Sound('/home/pi/Documents/Final/Aff6.wav')
 
-ONOFF=['# of on/off triggers']
-DIREC=['# of direction changes']
+ONOFF=[]
+DIREC=[]
 rots=['# of rotations in either direction']
-seed=['Seed']
-AFF=['Affirmation']
+seed=[]
+AFF=[]
+BIG=[]
+small=[]
 start2=[]
 
 try:
@@ -140,6 +143,8 @@ try:
             system_off ^= 1
             print("system off" if system_off else "system on")
             start2.append(time.time())
+            if set_counter_b == 1:
+                Music.play()
 
         dist_a = read_distance(trig_a, echo_a)
         #print(f"Distance a is {dist_a}")
@@ -170,9 +175,11 @@ try:
                 GPIO.output(pin_a, full_step[i])
                 sleep(0.01)
 
-
+        a=15.0
+        if len(start2) % 2 ==1:
+            start2.append(start2[0]+a)
         end2=time.time()
-        if end2-start2[0] >= 12.0:
+        if end2-start2[0] >= a:
             break
         #print(end2-start2[0], "time")
 
@@ -183,36 +190,55 @@ finally:
     print('done')
     GPIO.cleanup()
 
-
+Music.fadeout(500)
 
 remainder = set_counter_a % 6
 DIREC.append(set_counter_a)
 seed.append(remainder)
 ONOFF.append(set_counter_b)
+#print(int(len(start2)/2))
+#print(start2)
+for i in range(0,int(len(start2)/2)):
+    BIG.append((start2[2*i+1]-start2[2*i])/3.41)
+    small.append((start2[2*i+1]-start2[2*i])/2.29)
+#print(BIG,small)
+Big=[sum(BIG)]
+Small=[sum(small)]
+print('Direction changed ',DIREC,' times')
 
 if remainder == 0:
-    AFF.append('Breathe in, breathe out')
+    #AFF.append('Breathe in, breathe out')
+    print('Breathe in, breathe out')
     Aff1.play()
 elif remainder == 1:
-    AFF.append('Live in the moment')
+    #AFF.append('Live in the moment')
+    print('Live in the moment')
     Aff2.play()
 elif remainder == 2:
-    AFF.append('Release all stress')
+    #AFF.append('Release all stress')
+    print('Release all stress')
     Aff3.play()
 elif remainder == 3:
-    AFF.append('Focus on the good energy')
+    #AFF.append('Focus on the good energy')
+    print('Focus on the good energy')
     Aff4.play()
 elif remainder == 4:
-    AFF.append('Be thankful')
+    #AFF.append('Be thankful')
+    print('Be thankful')
     Aff5.play()
 elif remainder == 5:
-    AFF.append('Quiet moments build clear thoughts')
+    #AFF.append('Quiet moments build clear thoughts')
+    print('Quiet moments build clear thoughts')
     Aff6.play()
 
 while pygame.mixer.get_busy():
     pygame.time.delay(100)
 
+AFF.append(2)
 
-combined_array = np.column_stack((np.array(ONOFF), np.array(DIREC),np.array(seed),np.array(AFF)))
+combined_array = np.column_stack((np.array(ONOFF), np.array(DIREC),np.array(seed)
+                                  ,np.array(Big),np.array(Small)))
 
-np.savetxt('Harmony.csv', combined_array, delimiter = ',', fmt = '%.3f')
+np.savetxt('Harmony.csv', combined_array, delimiter = ',',
+           header='# of on/off triggers,# of direction changes,Seed,# of big spins,# of small spins',
+           fmt = '%.3f')
